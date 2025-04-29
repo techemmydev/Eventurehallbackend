@@ -17,7 +17,27 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(morgan("dev"));
 
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+const allowedOrigins = [
+  "http://localhost:5173", // local dev frontend
+  "https://eventurehall.com", // live frontend
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
+
+// app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+// app.use(cors({ origin: "https://eventurehall.com", credentials: true }));
+
 app.use(cookieParser()); // allows us to parse incoming cookies from the client
 
 // Routes
